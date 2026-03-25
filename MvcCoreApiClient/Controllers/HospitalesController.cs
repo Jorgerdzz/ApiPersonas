@@ -30,5 +30,11 @@ namespace MvcCoreApiClient.Controllers
             return View(hospitales);
         }
 
+        public async Task<IActionResult> ServidorDetails(int id)
+        {
+            Hospital h = await this.service.FindHospitalAsync(id);
+            return View(h);
+        }
+
     }
 }

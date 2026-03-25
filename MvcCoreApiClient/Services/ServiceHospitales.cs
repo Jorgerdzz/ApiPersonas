@@ -11,9 +11,9 @@ namespace MvcCoreApiClient.Services
         //NECESITAMOS INDICAR EL TIPO DE DATOS QUE VAMOS A LEER
         private MediaTypeWithQualityHeaderValue header;
 
-        public ServiceHospitales()
+        public ServiceHospitales(IConfiguration configuration)
         {
-            this.apiUrl = "https://apicorehospitalesjra-fmcaf9d2haacbph2.italynorth-01.azurewebsites.net/";
+            this.apiUrl = configuration.GetValue<string>("ApiUrls:ApiHospitales");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
         }
 
@@ -41,6 +41,29 @@ namespace MvcCoreApiClient.Services
                     //MEDIANTE NEWTON DESERIALIZAMOS JSON A LIST
                     List<Hospital> hospitales = JsonConvert.DeserializeObject<List<Hospital>>(json);
                     return hospitales;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public async Task<Hospital> FindHospitalAsync(int id)
+        {
+            using(HttpClient client = new HttpClient())
+            {
+                string request = "api/hospital/" + id;
+                client.BaseAddress = new Uri(this.apiUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.header);
+                HttpResponseMessage response = await client.GetAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    //SI LAS PROPIEDAD DEL MODEL Y DEL JSON SE LLAMAN IGUAL
+                    //NO ES NECESARIO DECORAR CON [JsonProperty] Y TAMPOCO UTILIZAR JsonConvert
+                    Hospital h = await response.Content.ReadAsAsync<Hospital>();
+                    return h;
                 }
                 else
                 {
