@@ -1,7 +1,9 @@
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -14,10 +16,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapOpenApi();
-
+app.MapScalarApiReference();
 app.UseHttpsRedirection();
-app.UseSwagger();
-app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "ApiPersonas"));
+
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/scalar");
+    return Task.CompletedTask;
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
